@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
-using Microsoft.VisualBasic.FileIO;
+//using Microsoft.VisualBasic.FileIO;
 
 namespace M2Lib.m2
 {
@@ -27,7 +27,9 @@ namespace M2Lib.m2
             var assembly = Assembly.GetExecutingAssembly();
             var embeddedStream = assembly.GetManifestResourceStream("M2Lib.src.csv.AnimationData.csv");
             Debug.Assert(embeddedStream != null, "Could not open embedded ressource AnimationData");
-            var csvParser = new TextFieldParser(embeddedStream) {CommentTokens = new[] {"#"}};
+            
+            // FIXME removing csvParser due to VisualBasic reference
+            /*var csvParser = new TextFieldParser(embeddedStream) {CommentTokens = new[] {"#"}};
             csvParser.SetDelimiters(",");
             csvParser.HasFieldsEnclosedInQuotes = true;
             csvParser.ReadLine(); // Skip first line
@@ -42,7 +44,8 @@ namespace M2Lib.m2
                 NameToId[name] = id;
                 IdToName[id] = name;
             }
-            csvParser.Close();
+            csvParser.Close();*/
+
             ushort[] playThenStopValues =
             {
                 NameToId["Dead"],

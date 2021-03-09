@@ -41,8 +41,7 @@ namespace M2Lib.m2
         public string Name => AnimationData.IdToName[AnimationId];
         public uint TimeEnd => TimeStart + Length;
 
-        public bool IsExtern => (Flags & (SequenceFlags.Looped | SequenceFlags.LowPriority | SequenceFlags.Stored)) == 0
-            ;
+        public bool IsExtern => (Flags & (SequenceFlags.Looped | SequenceFlags.LowPriority | SequenceFlags.Stored)) == 0;
 
         public bool IsAlias => (Flags & SequenceFlags.HasNext) != 0;
 
@@ -147,7 +146,6 @@ namespace M2Lib.m2
         }
 
         // ANIMATION LOOKUP
-
         public static M2Array<short> GenerateLookup(M2Array<M2Sequence> sequences)
         {
             var lookup = new M2Array<short>();
