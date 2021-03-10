@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 using M2Lib.interfaces;
 using M2Lib.types;
 
@@ -7,9 +8,9 @@ namespace M2Lib.m2
 {
     public class M2TextureTransform : IAnimated
     {
-        public M2Track<C3Vector> Translation { get; set; } = new M2Track<C3Vector>();
-        public M2Track<C4Quaternion> Rotation { get; set; } = new M2Track<C4Quaternion>(new C4Quaternion(0, 0, 0, 1));
-        public M2Track<C3Vector> Scale { get; set; } = new M2Track<C3Vector>(new C3Vector(1, 1, 1));
+        public M2Track<Vector3> Translation { get; set; } = new M2Track<Vector3>();
+        public M2Track<Quaternion> Rotation { get; set; } = new M2Track<Quaternion>(Quaternion.identity);
+        public M2Track<Vector3> Scale { get; set; } = new M2Track<Vector3>(Vector3.one);
 
         public void Load(BinaryReader stream, M2.Format version)
         {

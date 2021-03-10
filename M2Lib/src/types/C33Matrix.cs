@@ -1,15 +1,16 @@
-﻿namespace M2Lib.types
-{
+﻿using UnityEngine;
+namespace M2Lib.types
+{    
     /// <summary>
-    ///     A three by three matrix.
+    ///     A 3x3 matrix;
     /// </summary>
     public class C33Matrix
     {
-        public readonly C3Vector[] Columns = new C3Vector[3];
+        public readonly Vector3[] Columns = new Vector3[3];
 
-        public C33Matrix() : this(new C3Vector(), new C3Vector(), new C3Vector()) { }
+        public C33Matrix() : this(new Vector3(), new Vector3(), new Vector3()) { }
 
-        public C33Matrix(C3Vector col0, C3Vector col1, C3Vector col2)
+        public C33Matrix(Vector3 col0, Vector3 col1, Vector3 col2)
         {
             //Columns = new C3Vector[3];
             Columns[0] = col0;

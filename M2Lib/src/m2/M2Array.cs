@@ -150,6 +150,10 @@ namespace M2Lib.m2
             return Encoding.UTF8.GetString(array.ToArray()).Trim('\0');
         }
 
+        public static string ToNameString(this M2Array<char> array) {
+            return new string(array.ToArray());// Encoding.UTF8.GetString( array.to ToArray()).Trim('\0');
+        }
+
         public static void SetString(this M2Array<byte> array, string str)
         {
             array.Clear();

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 using M2Lib.interfaces;
 using M2Lib.io;
 using M2Lib.types;
@@ -10,7 +11,7 @@ namespace M2Lib.m2
     {
         public int Unknown { get; set; } = -1;
         public uint Flags { get; set; }
-        public C3Vector Position { get; set; }
+        public Vector3 Position { get; set; }
         public ushort Bone { get; set; }
         public ushort Texture { get; set; }
 
@@ -47,14 +48,14 @@ namespace M2Lib.m2
         public M2Track<float> EmissionAreaLength { get; set; } = new M2Track<float>();
         public M2Track<float> EmissionAreaWidth { get; set; } = new M2Track<float>();
         public M2Track<float> ZSource { get; set; } = new M2Track<float>();
-        public M2FakeTrack<C3Vector> ColorTrack { get; set; } = new M2FakeTrack<C3Vector>();
+        public M2FakeTrack<Vector3> ColorTrack { get; set; } = new M2FakeTrack<Vector3>();
         public M2FakeTrack<FixedPoint_0_15> AlphaTrack { get; set; } = new M2FakeTrack<FixedPoint_0_15>();
-        public M2FakeTrack<C2Vector> ScaleTrack { get; set; } = new M2FakeTrack<C2Vector>();
-        public C2Vector ScaleVary { get; set; }
+        public M2FakeTrack<Vector2> ScaleTrack { get; set; } = new M2FakeTrack<Vector2>();
+        public Vector2 ScaleVary { get; set; }
         public M2FakeTrack<ushort> HeadCellTrack { get; set; } = new M2FakeTrack<ushort>();
         public M2FakeTrack<ushort> TailCellTrack { get; set; } = new M2FakeTrack<ushort>();
         public float SomethingParticleStyle { get; set; }
-        public C2Vector Spread { get; set; }
+        public Vector2 Spread { get; set; }
         public CRange TwinkleScale { get; set; }
         public float Blank1 { get; set; }
         public float Drag { get; set; }
@@ -63,11 +64,11 @@ namespace M2Lib.m2
         public float Spin { get; set; }
         public float SpinVary { get; set; }
         public float Blank2 { get; set; }
-        public C3Vector Model1Rotation { get; set; }
-        public C3Vector Model2Rotation { get; set; }
-        public C3Vector ModelTranslation { get; set; }
-        public C4Vector FollowParams { get; set; }
-        public M2Array<C3Vector> UnknownReference { get; set; } = new M2Array<C3Vector>();
+        public Vector3 Model1Rotation { get; set; }
+        public Vector3 Model2Rotation { get; set; }
+        public Vector3 ModelTranslation { get; set; }
+        public Vector4 FollowParams { get; set; }
+        public M2Array<Vector3> UnknownReference { get; set; } = new M2Array<Vector3>();
         public M2Track<bool> EnabledIn { get; set; } = new M2Track<bool>(true);
         public readonly FixedPoint_6_9[] MultiTextureParam0 = new FixedPoint_6_9[4];
         public readonly FixedPoint_6_9[] MultiTextureParam1 = new FixedPoint_6_9[4];
@@ -80,7 +81,7 @@ namespace M2Lib.m2
         {
             Unknown = stream.ReadInt32();
             Flags = stream.ReadUInt32();
-            Position = stream.ReadC3Vector();
+            Position = stream.ReadVector3();
             Bone = stream.ReadUInt16();
             Texture = stream.ReadUInt16();
             _modelFileName.Load(stream, version);
@@ -126,7 +127,7 @@ namespace M2Lib.m2
                 ColorTrack.Load(stream, version);
                 AlphaTrack.Load(stream, version);
                 ScaleTrack.Load(stream, version);
-                ScaleVary = stream.ReadC2Vector();
+                ScaleVary = stream.ReadVector2();
                 HeadCellTrack.Load(stream, version);
                 TailCellTrack.Load(stream, version);
             }
@@ -142,11 +143,11 @@ namespace M2Lib.m2
                 for (var i = 0; i < LegacyTiles.Length; i++)
                     LegacyTiles[i] = stream.ReadInt16(); //TODO 4 tailCellTrack ?
                 ColorTrack.Timestamps.Add(0);
-                ColorTrack.Values.Add(new C3Vector(colorTrack[0].B, colorTrack[0].G, colorTrack[0].R));
+                ColorTrack.Values.Add(new Vector3(colorTrack[0].B, colorTrack[0].G, colorTrack[0].R));
                 ColorTrack.Timestamps.Add((short) (midPoint*short.MaxValue));
-                ColorTrack.Values.Add(new C3Vector(colorTrack[1].B, colorTrack[1].G, colorTrack[1].R));
+                ColorTrack.Values.Add(new Vector3(colorTrack[1].B, colorTrack[1].G, colorTrack[1].R));
                 ColorTrack.Timestamps.Add(short.MaxValue);
-                ColorTrack.Values.Add(new C3Vector(colorTrack[2].B, colorTrack[2].G, colorTrack[2].R));
+                ColorTrack.Values.Add(new Vector3(colorTrack[2].B, colorTrack[2].G, colorTrack[2].R));
 
                 AlphaTrack.Timestamps.Add(0);
                 AlphaTrack.Values.Add(new FixedPoint_0_15((short)(128 * colorTrack[0].A)));
@@ -156,11 +157,11 @@ namespace M2Lib.m2
                 AlphaTrack.Values.Add(new FixedPoint_0_15((short)(128 * colorTrack[2].A)));
 
                 ScaleTrack.Timestamps.Add(0);
-                ScaleTrack.Values.Add(new C2Vector(scaleTrack[0], 0));
+                ScaleTrack.Values.Add(new Vector2(scaleTrack[0], 0));
                 ScaleTrack.Timestamps.Add((short) (midPoint*short.MaxValue));
-                ScaleTrack.Values.Add(new C2Vector(scaleTrack[1], 0));
+                ScaleTrack.Values.Add(new Vector2(scaleTrack[1], 0));
                 ScaleTrack.Timestamps.Add(short.MaxValue);
-                ScaleTrack.Values.Add(new C2Vector(scaleTrack[2], 0));
+                ScaleTrack.Values.Add(new Vector2(scaleTrack[2], 0));
 
                 HeadCellTrack.Timestamps.Add(0);
                 HeadCellTrack.Values.Add(headCellTrack1[0]);
@@ -173,7 +174,7 @@ namespace M2Lib.m2
                 // TODO TailCellTrack
             }
             SomethingParticleStyle = stream.ReadSingle();
-            Spread = stream.ReadC2Vector();
+            Spread = stream.ReadVector2();
             TwinkleScale = stream.ReadCRange();
             Blank1 = stream.ReadSingle();
             Drag = stream.ReadSingle();
@@ -184,9 +185,9 @@ namespace M2Lib.m2
                 Spin = stream.ReadSingle();
                 SpinVary = stream.ReadSingle();
                 Blank2 = stream.ReadSingle();
-                Model1Rotation = stream.ReadC3Vector();
-                Model2Rotation = stream.ReadC3Vector();
-                ModelTranslation = stream.ReadC3Vector();
+                Model1Rotation = stream.ReadVector3();
+                Model2Rotation = stream.ReadVector3();
+                ModelTranslation = stream.ReadVector3();
             }
             else
             {
@@ -194,7 +195,7 @@ namespace M2Lib.m2
                 for (var i = 0; i < LegacyManyFloats.Length; i++) LegacyManyFloats[i] = stream.ReadSingle();//LegacyManyFloats
                 BaseSpin = rotation;//TODO maybe not be right. Also, the other floats may fit BaseSpinVary, Spin and SpinVary
             }
-            FollowParams = stream.ReadC4Vector();
+            FollowParams = stream.ReadVector4();
             UnknownReference.Load(stream, version);
             EnabledIn.Load(stream, version);
             if (version <= M2.Format.LichKing) return;
@@ -274,7 +275,7 @@ namespace M2Lib.m2
                     {
                         var color = ColorTrack.Values[i];
                         var alpha = AlphaTrack.Values.Count >= 3 ? AlphaTrack.Values[i] : new FixedPoint_0_15(short.MaxValue);
-                        colorTrack[i] = new CArgb((byte) color.Z, (byte) color.Y, (byte) color.X, (byte) (alpha.ToShort()/128));
+                        colorTrack[i] = new CArgb((byte) color.z, (byte) color.y, (byte) color.x, (byte) (alpha.ToShort()/128));
                     }
                 }
                 if (HeadCellTrack.Values.Count >= 4)

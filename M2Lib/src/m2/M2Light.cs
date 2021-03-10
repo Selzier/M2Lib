@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 using M2Lib.interfaces;
 using M2Lib.io;
 using M2Lib.types;
@@ -16,10 +17,10 @@ namespace M2Lib.m2
 
         public LightType Type { get; set; } = LightType.Directional;
         public short Bone { get; set; } = -1;
-        public C3Vector Position { get; set; }
-        public M2Track<C3Vector> AmbientColor { get; set; } = new M2Track<C3Vector>();
+        public Vector3 Position { get; set; }
+        public M2Track<Vector3> AmbientColor { get; set; } = new M2Track<Vector3>();
         public M2Track<float> AmbientIntensity { get; set; } = new M2Track<float>();
-        public M2Track<C3Vector> DiffuseColor { get; set; } = new M2Track<C3Vector>();
+        public M2Track<Vector3> DiffuseColor { get; set; } = new M2Track<Vector3>();
         public M2Track<float> DiffuseIntensity { get; set; } = new M2Track<float>();
         public M2Track<float> AttenuationStart { get; set; } = new M2Track<float>();
         public M2Track<float> AttenuationEnd { get; set; } = new M2Track<float>();
@@ -29,7 +30,7 @@ namespace M2Lib.m2
         {
             Type = (LightType) stream.ReadUInt16();
             Bone = stream.ReadInt16();
-            Position = stream.ReadC3Vector();
+            Position = stream.ReadVector3();
             AmbientColor.Load(stream, version);
             AmbientIntensity.Load(stream, version);
             DiffuseColor.Load(stream, version);

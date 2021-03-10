@@ -1,4 +1,5 @@
-﻿namespace M2Lib.types
+﻿using UnityEngine;
+namespace M2Lib.types
 {
     /// <summary>
     ///     A four shorts (compressed) quaternion.
@@ -15,10 +16,23 @@
             W = p4;
         }
 
-        public static explicit operator C4Quaternion(M2CompQuat comp)
+        public M2CompQuat(float p1, float p2, float p3, float p4) {
+            X = FloatToShort(p1);
+            Y = FloatToShort(p2);
+            Z = FloatToShort(p3);
+            W = FloatToShort(p4);
+        }
+
+        public M2CompQuat(Quaternion quaternion) {
+            X = FloatToShort(quaternion.x);
+            Y = FloatToShort(quaternion.y);
+            Z = FloatToShort(quaternion.z);
+            W = FloatToShort(quaternion.w);
+        }
+
+        public static explicit operator Quaternion(M2CompQuat comp)
         {
-            return new C4Quaternion(ShortToFloat(comp.X), ShortToFloat(comp.Y), ShortToFloat(comp.Z),
-                ShortToFloat(comp.W));
+            return new Quaternion(ShortToFloat(comp.X), ShortToFloat(comp.Y), ShortToFloat(comp.Z), ShortToFloat(comp.W));
         }
 
         /// <summary>
@@ -30,6 +44,15 @@
         {
             if (value == -1) return 1;
             return (float) ((value > 0 ? value - 32767 : value + 32767)/32767.0);
+        }
+
+        /// <summary>
+        ///     Compress a float in a short
+        /// </summary>
+        /// <param name="value">Float to compress.</param>
+        /// <returns>A short, compressed version of value.</returns>
+        private static short FloatToShort(float value) {
+            return (short)(value > 0 ? value * 32767.0 - 32768 : value * 32767.0 + 32768);
         }
 
         public override string ToString()

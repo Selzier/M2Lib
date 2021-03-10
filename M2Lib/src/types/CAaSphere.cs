@@ -1,14 +1,15 @@
-﻿namespace M2Lib.types
+﻿using UnityEngine;
+namespace M2Lib.types
 {
     /// <summary>
     ///     An axis aligned sphere described by position and radius.
     /// </summary>
     public struct CAaSphere
     {
-        public readonly C3Vector Position;
+        public readonly Vector3 Position;
         public readonly float Radius;
 
-        public CAaSphere(C3Vector pos, float rad)
+        public CAaSphere(Vector3 pos, float rad)
         {
             Position = pos;
             Radius = rad;

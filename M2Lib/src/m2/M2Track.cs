@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using M2Lib.interfaces;
 using M2Lib.io;
 using M2Lib.types;
@@ -49,7 +50,7 @@ namespace M2Lib.m2
 
         public void Load(BinaryReader stream, M2.Format version)
         {
-            Debug.Assert(version != M2.Format.Useless);
+            if (version == M2.Format.Useless) { UnityEngine.Debug.LogError("Invalid Version: " + version); }
             InterpolationType = (InterpolationTypes) stream.ReadUInt16();
             GlobalSequence = stream.ReadInt16();
             if (version >= M2.Format.LichKing)
@@ -68,7 +69,7 @@ namespace M2Lib.m2
 
         public void Save(BinaryWriter stream, M2.Format version)
         {
-            Debug.Assert(version != M2.Format.Useless);
+            if (version == M2.Format.Useless) { UnityEngine.Debug.LogError("Invalid Version: " + version); }
             stream.Write((ushort) InterpolationType);
             stream.Write(GlobalSequence);
             if (version >= M2.Format.LichKing)
@@ -87,7 +88,7 @@ namespace M2Lib.m2
 
         public void LoadContent(BinaryReader stream, M2.Format version)
         {
-            Debug.Assert(version != M2.Format.Useless);
+            if (version == M2.Format.Useless) { UnityEngine.Debug.LogError("Invalid Version: " + version); }
             if (version >= M2.Format.LichKing)
             {
                 Timestamps.LoadContent(stream, version);
@@ -127,7 +128,7 @@ namespace M2Lib.m2
 
         public void SaveContent(BinaryWriter stream, M2.Format version)
         {
-            Debug.Assert(version != M2.Format.Useless);
+            if (version == M2.Format.Useless) { UnityEngine.Debug.LogError("Invalid Version: " + version); }
             if (version >= M2.Format.LichKing)
             {
                 Timestamps.SaveContent(stream, version);
@@ -296,7 +297,7 @@ namespace M2Lib.m2
 
         private void LegacyLoad(BinaryReader stream, M2.Format version)
         {
-            Debug.Assert(Sequences != null, "Sequences is null in M2Track<" + typeof (T) + ">");
+            if (Sequences == null) { UnityEngine.Debug.LogError("Sequences is null in M2Track<" + typeof(T) + ">"); }
             _legacyRanges.Load(stream, version);
             _legacyTimestamps.Load(stream, version);
             _legacyValues.Load(stream, version);
@@ -349,7 +350,7 @@ namespace M2Lib.m2
             {
                 return;
             }
-            Debug.Assert(Timestamps.Count == Sequences.Count);
+            if (Timestamps.Count != Sequences.Count) { UnityEngine.Debug.LogError("Timestamps.Count != Sequences.Count"); }
             uint rangeTime = 0;
             foreach(var times in Timestamps)
             {
@@ -404,7 +405,7 @@ namespace M2Lib.m2
 
     public static class M2TrackExtensions
     {
-        public static void Compress(this M2Track<C4Quaternion> track, M2Track<M2CompQuat> target)
+        public static void Compress(this M2Track<Quaternion> track, M2Track<M2CompQuat> target)
         {
             target.Timestamps.Clear();
             target.Values.Clear();
@@ -415,25 +416,29 @@ namespace M2Lib.m2
             for (var i = 0; i < track.Values.Count; i++)
             {
                 var newArray = new M2Array<M2CompQuat>();
-                newArray.AddRange(track.Values[i].Select(value => (M2CompQuat) value));
+                //newArray.AddRange(track.Values[i].Select(value => (M2CompQuat) value));
+                foreach (Quaternion q in track.Values[i]) {
+                    newArray.Add(new M2CompQuat(q));
+                }
+                                
                 target.Values.Add(newArray);
             }
         }
 
-        public static void Decompress(this M2Track<M2CompQuat> track, M2Track<C4Quaternion> target)
+        public static void Decompress(this M2Track<M2CompQuat> track, M2Track<Quaternion> target)
         {
             target.Timestamps.Clear();
             target.Values.Clear();
-            target.InterpolationType = (M2Track<C4Quaternion>.InterpolationTypes) track.InterpolationType;
+            target.InterpolationType = (M2Track<Quaternion>.InterpolationTypes) track.InterpolationType;
             target.GlobalSequence = track.GlobalSequence;
             target.Sequences = track.Sequences;
             for (var i = 0; i < track.Timestamps.Count; i++) target.Timestamps.Add(track.Timestamps[i]);
             for (var i = 0; i < track.Values.Count; i++)
             {
-                var newArray = new M2Array<C4Quaternion>();
-                newArray.AddRange(track.Values[i].Select(value => (C4Quaternion) value));
+                var newArray = new M2Array<Quaternion>();
+                newArray.AddRange(track.Values[i].Select(value => (Quaternion) value));
                 target.Values.Add(newArray);
             }
-        }
+        }        
     }
 }

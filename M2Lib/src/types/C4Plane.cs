@@ -1,4 +1,5 @@
-﻿namespace M2Lib.types
+﻿using UnityEngine;
+namespace M2Lib.types
 {
     /// <summary>
     ///     A 3D plane defined by four floats
@@ -6,9 +7,9 @@
     public struct C4Plane
     {
         public readonly float Distance;
-        public readonly C3Vector Normal;
+        public readonly Vector3 Normal;
 
-        public C4Plane(C3Vector vec, float dist)
+        public C4Plane(Vector3 vec, float dist)
         {
             Normal = vec;
             Distance = dist;

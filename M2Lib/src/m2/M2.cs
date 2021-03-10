@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using M2Lib.interfaces;
 using M2Lib.io;
 using M2Lib.types;
@@ -114,8 +115,8 @@ namespace M2Lib.m2
         public CAaBox CollisionBox { get; set; }
         public float CollisionSphereRadius { get; set; }
         public M2Array<ushort> CollisionTriangles { get; } = new M2Array<ushort>();
-        public M2Array<C3Vector> CollisionVertices { get; } = new M2Array<C3Vector>();
-        public M2Array<C3Vector> CollisionNormals { get; } = new M2Array<C3Vector>();
+        public M2Array<Vector3> CollisionVertices { get; } = new M2Array<Vector3>();
+        public M2Array<Vector3> CollisionNormals { get; } = new M2Array<Vector3>();
         public M2Array<M2Ribbon> Ribbons { get; } = new M2Array<M2Ribbon>();
         public M2Array<M2Particle> Particles { get; } = new M2Array<M2Particle>();
         public M2Array<ushort> BlendingMaps { get; } = new M2Array<ushort>();
@@ -131,13 +132,13 @@ namespace M2Lib.m2
                 stream = new BinaryReader(new Substream(stream.BaseStream));
                 magic = Encoding.UTF8.GetString(stream.ReadBytes(4));
             }
-            
-            Debug.Assert(magic == "MD20");
+
+            if (magic != "MD20") { UnityEngine.Debug.LogError("Invalid MD20 Magic: " + magic); }
             // LOAD HEADER
             if (version == Format.Useless) version = (Format) stream.ReadUInt32();
             else stream.ReadUInt32();
             Version = version; // 0x004
-            Debug.Assert(version != Format.Useless);
+            if (version == Format.Useless) { UnityEngine.Debug.LogError("Invalid Version" + version); }
             _name.Load(stream, version); // 0x008
             GlobalModelFlags = (GlobalFlags) stream.ReadUInt32();
             GlobalSequences.Load(stream, version);

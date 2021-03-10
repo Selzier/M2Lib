@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using UnityEngine;
 using M2Lib.interfaces;
 using M2Lib.io;
 using M2Lib.types;
@@ -30,14 +31,15 @@ namespace M2Lib.m2
         public BoneFlags Flags { get; set; } = 0;
         public short ParentBone { get; set; } = -1;
         public ushort SubmeshId { get; set; }
-        public M2Track<C3Vector> Translation { get; set; } = new M2Track<C3Vector>();
-        public M2Track<C4Quaternion> Rotation { get; set; } = new M2Track<C4Quaternion>(new C4Quaternion(0,0,0,1));
-        public M2Track<C3Vector> Scale { get; set; } = new M2Track<C3Vector>(new C3Vector(1, 1, 1));
-        public C3Vector Pivot { get; set; }
+        public M2Track<Vector3> Translation { get; set; } = new M2Track<Vector3>();
+        public M2Track<Quaternion> Rotation { get; set; } = new M2Track<Quaternion>(Quaternion.identity);
+        public M2Track<Vector3> Scale { get; set; } = new M2Track<Vector3>(Vector3.one);
+        public Vector3 Pivot { get; set; }
 
         public void Load(BinaryReader stream, M2.Format version)
         {
-            Debug.Assert(version != M2.Format.Useless);
+            //Debug.Assert(version != M2.Format.Useless);
+            if (version == M2.Format.Useless) { UnityEngine.Debug.LogError("Invalid version: " + version); }
             KeyBoneId = (KeyBone) stream.ReadInt32();
             Flags = (BoneFlags) stream.ReadUInt32();
             ParentBone = stream.ReadInt16();
@@ -57,12 +59,13 @@ namespace M2Lib.m2
             else
                 Rotation.Load(stream, version);
             Scale.Load(stream, version);
-            Pivot = stream.ReadC3Vector();
+            Pivot = stream.ReadVector3();
         }
 
         public void Save(BinaryWriter stream, M2.Format version)
         {
-            Debug.Assert(version != M2.Format.Useless);
+            //Debug.Assert(version != M2.Format.Useless);
+            if (version == M2.Format.Useless) { UnityEngine.Debug.LogError("Invalid version: " + version); }
             stream.Write((int) KeyBoneId);
             stream.Write((uint) Flags);
             stream.Write(ParentBone);
@@ -88,7 +91,8 @@ namespace M2Lib.m2
 
         public void LoadContent(BinaryReader stream, M2.Format version)
         {
-            Debug.Assert(version != M2.Format.Useless);
+            //Debug.Assert(version != M2.Format.Useless);
+            if (version == M2.Format.Useless) { UnityEngine.Debug.LogError("Invalid version: " + version); }
             Translation.LoadContent(stream, version);
             if (version > M2.Format.Classic)
             {
@@ -104,7 +108,8 @@ namespace M2Lib.m2
 
         public void SaveContent(BinaryWriter stream, M2.Format version)
         {
-            Debug.Assert(version != M2.Format.Useless);
+            //Debug.Assert(version != M2.Format.Useless);
+            if (version == M2.Format.Useless) { UnityEngine.Debug.LogError("Invalid version: " + version); }
             Translation.SaveContent(stream, version);
             if (version > M2.Format.Classic)
             {
@@ -124,7 +129,8 @@ namespace M2Lib.m2
         /// <param name="sequences"></param>
         public void SetSequences(IReadOnlyList<M2Sequence> sequences)
         {
-            Debug.Assert(sequences != null, "Tried to set null sequences.");
+            //Debug.Assert(sequences != null, "Tried to set null sequences.");
+            if (sequences == null) { UnityEngine.Debug.LogError("Tried to set null sequences."); }
             Translation.Sequences = sequences;
             Rotation.Sequences = sequences;
             Scale.Sequences = sequences;

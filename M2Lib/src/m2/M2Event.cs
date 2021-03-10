@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using UnityEngine;
 using M2Lib.interfaces;
 using M2Lib.io;
 using M2Lib.types;
@@ -19,7 +20,7 @@ namespace M2Lib.m2
         public int Data { get; set; }
         public ushort Bone { get; set; }
         public ushort Unknown { get; set; }//Only use in early vanilla models. See BogBeast.m2 from model.MPQ
-        public C3Vector Position { get; set; }
+        public Vector3 Position { get; set; }
         public M2TrackBase Enabled { get; set; } = new M2TrackBase();
 
         public void Load(BinaryReader stream, M2.Format version)
@@ -28,7 +29,7 @@ namespace M2Lib.m2
             Data = stream.ReadInt32();
             Bone = stream.ReadUInt16();
             Unknown = stream.ReadUInt16();
-            Position = stream.ReadC3Vector();
+            Position = stream.ReadVector3();
             Enabled.Load(stream, version);
         }
 

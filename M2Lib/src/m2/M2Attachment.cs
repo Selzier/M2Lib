@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEngine;
 using M2Lib.interfaces;
 using M2Lib.io;
 using M2Lib.types;
@@ -11,14 +12,14 @@ namespace M2Lib.m2
     {
         public uint Id { get; set; }
         public uint Bone { get; set; }
-        public C3Vector Position { get; set; }
+        public Vector3 Position { get; set; }
         public M2Track<bool> AnimateAttached { get; set; } = new M2Track<bool>(true);
 
         public void Load(BinaryReader stream, M2.Format version)
         {
             Id = stream.ReadUInt32();
             Bone = stream.ReadUInt32();
-            Position = stream.ReadC3Vector();
+            Position = stream.ReadVector3();
             AnimateAttached.Load(stream, version);
         }
 

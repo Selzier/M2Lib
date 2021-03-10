@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 using M2Lib.interfaces;
 using M2Lib.io;
 using M2Lib.types;
@@ -10,10 +11,10 @@ namespace M2Lib.m2
     {
         public int Unknown1 { get; set; } = -1;
         public uint Bone { get; set; }
-        public C3Vector Position { get; set; }
+        public Vector3 Position { get; set; }
         public M2Array<ushort> TextureRefs { get; set; } = new M2Array<ushort>();
         public M2Array<ushort> BlendRefs { get; set; } = new M2Array<ushort>();
-        public M2Track<C3Vector> Color { get; set; } = new M2Track<C3Vector>(); //TODO check default values here
+        public M2Track<Vector3> Color { get; set; } = new M2Track<Vector3>(); //TODO check default values here
         public M2Track<FixedPoint_0_15> Opacity { get; set; } = new M2Track<FixedPoint_0_15>(new FixedPoint_0_15(0x7FFF));
         public M2Track<float> HeightAbove { get; set; } = new M2Track<float>();
         public M2Track<float> HeightBelow { get; set; } = new M2Track<float>();
@@ -30,7 +31,7 @@ namespace M2Lib.m2
         {
             Unknown1 = stream.ReadInt32();
             Bone = stream.ReadUInt32();
-            Position = stream.ReadC3Vector();
+            Position = stream.ReadVector3();
             TextureRefs.Load(stream, version);
             BlendRefs.Load(stream, version);
             Color.Load(stream, version);

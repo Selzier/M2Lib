@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using UnityEngine;
 using M2Lib.interfaces;
 using M2Lib.io;
 using M2Lib.types;
@@ -18,8 +19,8 @@ namespace M2Lib.m2
         public ushort StartBones { get; set; }
         public ushort BoneInfluences { get; set; }
         public ushort RootBone { get; set; }
-        public C3Vector CenterMass { get; set; }
-        public C3Vector CenterBoundingBox { get; set; }
+        public Vector3 CenterMass { get; set; }
+        public Vector3 CenterBoundingBox { get; set; }
         public float Radius { get; set; }
 
         public void Load(BinaryReader stream, M2.Format version)
@@ -41,9 +42,9 @@ namespace M2Lib.m2
             StartBones = stream.ReadUInt16();
             BoneInfluences = stream.ReadUInt16();
             RootBone = stream.ReadUInt16();
-            CenterMass = stream.ReadC3Vector();
+            CenterMass = stream.ReadVector3();
             if (version <= M2.Format.Classic) return;
-            CenterBoundingBox = stream.ReadC3Vector();
+            CenterBoundingBox = stream.ReadVector3();
             Radius = stream.ReadSingle();
         }
 

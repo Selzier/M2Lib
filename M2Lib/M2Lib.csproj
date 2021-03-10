@@ -45,6 +45,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\..\..\..\UnityEditors\2019.4.3f1\Editor\Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -78,10 +81,7 @@
     <Compile Include="src\m2\M2TextureWeight.cs" />
     <Compile Include="src\m2\M2Vertex.cs" />
     <Compile Include="src\m2\M2SkinProfile.cs" />
-    <Compile Include="src\types\C2Vector.cs" />
     <Compile Include="src\types\C33Matrix.cs" />
-    <Compile Include="src\types\C3Vector.cs" />
-    <Compile Include="src\types\C44Matrix.cs" />
     <Compile Include="src\types\C4Plane.cs" />
     <Compile Include="src\types\C4Quaternion.cs" />
     <Compile Include="src\types\C4Vector.cs" />

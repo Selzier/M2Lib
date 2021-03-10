@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEngine;
 using M2Lib.interfaces;
 using M2Lib.io;
 using M2Lib.types;
@@ -20,11 +21,11 @@ namespace M2Lib.m2
         public float FarClip { get; set; }
         public float NearClip { get; set; }
         public M2Track<C33Matrix> Positions { get; set; } = new M2Track<C33Matrix>();
-        public C3Vector PositionBase { get; set; }
+        public Vector3 PositionBase { get; set; }
         public M2Track<C33Matrix> TargetPositions { get; set; } = new M2Track<C33Matrix>();
-        public C3Vector TargetPositionBase { get; set; }
-        public M2Track<C3Vector> Roll { get; set; } = new M2Track<C3Vector>();
-        public M2Track<C3Vector> FieldOfView { get; set; } = new M2Track<C3Vector>();
+        public Vector3 TargetPositionBase { get; set; }
+        public M2Track<Vector3> Roll { get; set; } = new M2Track<Vector3>();
+        public M2Track<Vector3> FieldOfView { get; set; } = new M2Track<Vector3>();
 
         public void Load(BinaryReader stream, M2.Format version)
         {
@@ -32,14 +33,14 @@ namespace M2Lib.m2
             if (version < (M2.Format) 271)
             {
                 FieldOfView.Timestamps.Add(new M2Array<uint> {0});
-                FieldOfView.Values.Add(new M2Array<C3Vector> {new C3Vector(stream.ReadSingle(), 0, 0)});
+                FieldOfView.Values.Add(new M2Array<Vector3> {new Vector3(stream.ReadSingle(), 0, 0)});
             }
             FarClip = stream.ReadSingle();
             NearClip = stream.ReadSingle();
             Positions.Load(stream, version);
-            PositionBase = stream.ReadC3Vector();
+            PositionBase = stream.ReadVector3();
             TargetPositions.Load(stream, version);
-            TargetPositionBase = stream.ReadC3Vector();
+            TargetPositionBase = stream.ReadVector3();
             Roll.Load(stream, version);
             if (version >= (M2.Format) 271) FieldOfView.Load(stream, version);
         }
@@ -49,7 +50,7 @@ namespace M2Lib.m2
             stream.Write((int) Type);
             if (version < (M2.Format)271)
             {
-                if (FieldOfView.Values.Count == 1) stream.Write(FieldOfView.Values[0][0].X);
+                if (FieldOfView.Values.Count == 1) stream.Write(FieldOfView.Values[0][0].x);
                 else stream.Write(Type == CameraType.Portrait ? 0.7F : 0.97F);
             }
             stream.Write(FarClip);

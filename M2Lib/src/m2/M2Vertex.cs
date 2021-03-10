@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using UnityEngine;
 using M2Lib.interfaces;
 using M2Lib.io;
 using M2Lib.types;
@@ -9,11 +10,11 @@ namespace M2Lib.m2
 {
     public class M2Vertex : IMarshalable, IEquatable<M2Vertex>
     {
-        public C3Vector Position { get; set; }
+        public Vector3 Position { get; set; }
         public byte[] BoneWeights { get; set; } = new byte[4];
         public byte[] BoneIndices { get; set; } = new byte[4];
-        public C3Vector Normal { get; set; }
-        public C2Vector[] TexCoords { get; set; } = {new C2Vector(), new C2Vector()};
+        public Vector3 Normal { get; set; }
+        public Vector2[] TexCoords { get; set; } = {new Vector2(), new Vector2()};
 
         public override string ToString()
         {
@@ -58,11 +59,11 @@ namespace M2Lib.m2
 
         public void Load(BinaryReader stream, M2.Format version)
         {
-            Position = stream.ReadC3Vector();
+            Position = stream.ReadVector3();
             for (var i = 0; i < BoneWeights.Length; i++) BoneWeights[i] = stream.ReadByte();
             for (var i = 0; i < BoneIndices.Length; i++) BoneIndices[i] = stream.ReadByte();
-            Normal = stream.ReadC3Vector();
-            TexCoords = new[] {stream.ReadC2Vector(), stream.ReadC2Vector()};
+            Normal = stream.ReadVector3();
+            TexCoords = new[] {stream.ReadVector2(), stream.ReadVector2()};
         }
 
         public void Save(BinaryWriter stream, M2.Format version)

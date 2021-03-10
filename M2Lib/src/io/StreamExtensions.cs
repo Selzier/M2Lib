@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 using M2Lib.interfaces;
 using M2Lib.m2;
 using M2Lib.types;
@@ -27,13 +28,12 @@ namespace M2Lib.io
             ReadFunctions[typeof (int)] = s => s.ReadInt32();
             ReadFunctions[typeof (uint)] = s => s.ReadUInt32();
             ReadFunctions[typeof (float)] = s => s.ReadSingle();
-            ReadFunctions[typeof (C2Vector)] = s => s.ReadC2Vector();
+            ReadFunctions[typeof (Vector2)] = s => s.ReadVector2();
             ReadFunctions[typeof (C33Matrix)] = s => s.ReadC33Matrix();
-            ReadFunctions[typeof (C3Vector)] = s => s.ReadC3Vector();
-            ReadFunctions[typeof (C44Matrix)] = s => s.ReadC44Matrix();
+            ReadFunctions[typeof (Vector3)] = s => s.ReadVector3();
             ReadFunctions[typeof (C4Plane)] = s => s.ReadC4Plane();
-            ReadFunctions[typeof (C4Quaternion)] = s => s.ReadC4Quaternion();
-            ReadFunctions[typeof (C4Vector)] = s => s.ReadC4Vector();
+            ReadFunctions[typeof (Quaternion)] = s => s.ReadQuaternion();
+            ReadFunctions[typeof (Vector4)] = s => s.ReadVector4();
             ReadFunctions[typeof (CAaBox)] = s => s.ReadCAaBox();
             ReadFunctions[typeof (CAaSphere)] = s => s.ReadCAaSphere();
             ReadFunctions[typeof (CArgb)] = s => s.ReadCArgb();
@@ -51,13 +51,12 @@ namespace M2Lib.io
             WriteFunctions[typeof (int)] = (s, t) => s.Write((int) t);
             WriteFunctions[typeof (uint)] = (s, t) => s.Write((uint) t);
             WriteFunctions[typeof (float)] = (s, t) => s.Write((float) t);
-            WriteFunctions[typeof (C2Vector)] = (s, t) => s.Write((C2Vector) t);
+            WriteFunctions[typeof (Vector2)] = (s, t) => s.Write((Vector2) t);
             WriteFunctions[typeof (C33Matrix)] = (s, t) => s.Write((C33Matrix) t);
-            WriteFunctions[typeof (C3Vector)] = (s, t) => s.Write((C3Vector) t);
-            WriteFunctions[typeof (C44Matrix)] = (s, t) => s.Write((C44Matrix) t);
+            WriteFunctions[typeof (Vector3)] = (s, t) => s.Write((Vector3) t);
             WriteFunctions[typeof (C4Plane)] = (s, t) => s.Write((C4Plane) t);
-            WriteFunctions[typeof (C4Quaternion)] = (s, t) => s.Write((C4Quaternion) t);
-            WriteFunctions[typeof (C4Vector)] = (s, t) => s.Write((C4Vector) t);
+            WriteFunctions[typeof (Quaternion)] = (s, t) => s.Write((Quaternion) t);
+            WriteFunctions[typeof (Vector4)] = (s, t) => s.Write((Vector4) t);
             WriteFunctions[typeof (CAaBox)] = (s, t) => s.Write((CAaBox) t);
             WriteFunctions[typeof (CAaSphere)] = (s, t) => s.Write((CAaSphere) t);
             WriteFunctions[typeof (CArgb)] = (s, t) => s.Write((CArgb) t);
@@ -87,33 +86,29 @@ namespace M2Lib.io
         }
 
         //READING OF STRUCTS
-        public static C2Vector ReadC2Vector(this BinaryReader stream)
-            => new C2Vector(stream.ReadSingle(), stream.ReadSingle());
+        public static Vector2 ReadVector2(this BinaryReader stream)
+            => new Vector2(stream.ReadSingle(), stream.ReadSingle());
 
         public static C33Matrix ReadC33Matrix(this BinaryReader stream)
-            => new C33Matrix(stream.ReadC3Vector(), stream.ReadC3Vector(), stream.ReadC3Vector());
+            => new C33Matrix(stream.ReadVector3(), stream.ReadVector3(), stream.ReadVector3());
 
-        public static C3Vector ReadC3Vector(this BinaryReader stream)
-            => new C3Vector(stream.ReadSingle(), stream.ReadSingle(), stream.ReadSingle());
-
-        public static C44Matrix ReadC44Matrix(this BinaryReader stream)
-            => new C44Matrix(stream.ReadC4Vector(), stream.ReadC4Vector(), stream.ReadC4Vector(),
-                stream.ReadC4Vector());
+        public static Vector3 ReadVector3(this BinaryReader stream)
+            => new Vector3(stream.ReadSingle(), stream.ReadSingle(), stream.ReadSingle());
 
         public static C4Plane ReadC4Plane(this BinaryReader stream)
-            => new C4Plane(stream.ReadC3Vector(), stream.ReadSingle());
+            => new C4Plane(stream.ReadVector3(), stream.ReadSingle());
 
-        public static C4Quaternion ReadC4Quaternion(this BinaryReader stream)
-            => new C4Quaternion(stream.ReadSingle(), stream.ReadSingle(), stream.ReadSingle(), stream.ReadSingle());
+        public static Quaternion ReadQuaternion(this BinaryReader stream)
+            => new Quaternion(stream.ReadSingle(), stream.ReadSingle(), stream.ReadSingle(), stream.ReadSingle());
 
-        public static C4Vector ReadC4Vector(this BinaryReader stream)
-            => new C4Vector(stream.ReadSingle(), stream.ReadSingle(), stream.ReadSingle(), stream.ReadSingle());
+        public static Vector4 ReadVector4(this BinaryReader stream)
+            => new Vector4(stream.ReadSingle(), stream.ReadSingle(), stream.ReadSingle(), stream.ReadSingle());
 
         public static CAaBox ReadCAaBox(this BinaryReader stream)
-            => new CAaBox(stream.ReadC3Vector(), stream.ReadC3Vector());
+            => new CAaBox(stream.ReadVector3(), stream.ReadVector3());
 
         public static CAaSphere ReadCAaSphere(this BinaryReader stream)
-            => new CAaSphere(stream.ReadC3Vector(), stream.ReadSingle());
+            => new CAaSphere(stream.ReadVector3(), stream.ReadSingle());
 
         public static CArgb ReadCArgb(this BinaryReader stream)
             => new CArgb(stream.ReadByte(), stream.ReadByte(), stream.ReadByte(), stream.ReadByte());
@@ -137,10 +132,10 @@ namespace M2Lib.io
             => new VertexProperty(stream.ReadByte(), stream.ReadByte(), stream.ReadByte(), stream.ReadByte());
 
         //WRITING OF STRUCTS
-        public static void Write(this BinaryWriter stream, C2Vector item)
+        public static void Write(this BinaryWriter stream, Vector2 item)
         {
-            stream.Write(item.X);
-            stream.Write(item.Y);
+            stream.Write(item.x);
+            stream.Write(item.y);
         }
 
         public static void Write(this BinaryWriter stream, C33Matrix item)
@@ -152,20 +147,11 @@ namespace M2Lib.io
             }
         }
 
-        public static void Write(this BinaryWriter stream, C3Vector item)
+        public static void Write(this BinaryWriter stream, Vector3 item)
         {
-            stream.Write(item.X);
-            stream.Write(item.Y);
-            stream.Write(item.Z);
-        }
-
-        public static void Write(this BinaryWriter stream, C44Matrix item)
-        {
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (var i = 0; i < item.Columns.Length; i++)
-            {
-                stream.Write(item.Columns[i]);
-            }
+            stream.Write(item.x);
+            stream.Write(item.y);
+            stream.Write(item.z);
         }
 
         public static void Write(this BinaryWriter stream, C4Plane item)
@@ -174,20 +160,20 @@ namespace M2Lib.io
             stream.Write(item.Distance);
         }
 
-        public static void Write(this BinaryWriter stream, C4Quaternion item)
+        public static void Write(this BinaryWriter stream, Quaternion item)
         {
-            stream.Write(item.X);
-            stream.Write(item.Y);
-            stream.Write(item.Z);
-            stream.Write(item.W);
+            stream.Write(item.x);
+            stream.Write(item.y);
+            stream.Write(item.z);
+            stream.Write(item.w);
         }
 
-        public static void Write(this BinaryWriter stream, C4Vector item)
+        public static void Write(this BinaryWriter stream, Vector4 item)
         {
-            stream.Write(item.W);
-            stream.Write(item.X);
-            stream.Write(item.Y);
-            stream.Write(item.Z);
+            stream.Write(item.w);
+            stream.Write(item.x);
+            stream.Write(item.y);
+            stream.Write(item.z);
         }
 
         public static void Write(this BinaryWriter stream, CAaBox item)

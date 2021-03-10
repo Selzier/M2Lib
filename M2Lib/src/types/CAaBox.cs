@@ -1,13 +1,14 @@
-﻿namespace M2Lib.types
+﻿using UnityEngine;
+namespace M2Lib.types
 {
     /// <summary>
     ///     An axis aligned box described by the minimum and maximum point.
     /// </summary>
     public struct CAaBox
     {
-        public readonly C3Vector Min, Max;
+        public readonly Vector3 Min, Max;
 
-        public CAaBox(C3Vector min, C3Vector max)
+        public CAaBox(Vector3 min, Vector3 max)
         {
             Min = min;
             Max = max;
