@@ -15,6 +15,7 @@ namespace M2Lib.m2
         public M2Array<M2Batch> TextureUnits { get; set; } = new M2Array<M2Batch>();
         public uint Bones { get; set; } = 21;
         public M2Array<M2ShadowBatch> ShadowBatches { get; set; } = new M2Array<M2ShadowBatch>();
+        public int FileDataID { get; set; }
 
         public void Load(BinaryReader stream, M2.Format version)
         {

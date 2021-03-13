@@ -40,6 +40,7 @@ namespace M2Lib.m2
         private readonly M2Array<byte> _name = new M2Array<byte>();
         public TextureType Type { get; set; } = TextureType.MonsterSkin1;
         public TextureFlags Flags { get; set; }
+        public int FileDataID { get; set; }
 
         public string Name
         {

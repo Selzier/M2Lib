@@ -7,6 +7,7 @@ using UnityEngine;
 using M2Lib.interfaces;
 using M2Lib.io;
 using M2Lib.types;
+using M2Lib.m2;
 
 namespace M2Lib.m2
 {
@@ -45,7 +46,8 @@ namespace M2Lib.m2
         /// <summary>
         /// Possible Chunks in an M2 File
         /// </summary>
-        public enum ChunkID { 
+        public enum ChunkID {
+            MD20 = 808600653,
             MD21 = 825377869,
             PFID = 1145652816,
             SFID = 1145652819,
@@ -70,10 +72,8 @@ namespace M2Lib.m2
             PFDC = 1128547920,
             EDGF = 1179075653,
             NERF = 1179796814,
-            DETL = 1280591172        
-        }
-
-        public int[] skinFileDataIDs;
+            DETL = 1280591172
+        }        
         public int nViews;
         //end my temp vars
 
@@ -119,30 +119,71 @@ namespace M2Lib.m2
         public M2Array<Vector3> CollisionNormals { get; } = new M2Array<Vector3>();
         public M2Array<M2Ribbon> Ribbons { get; } = new M2Array<M2Ribbon>();
         public M2Array<M2Particle> Particles { get; } = new M2Array<M2Particle>();
-        public M2Array<ushort> BlendingMaps { get; } = new M2Array<ushort>();
+        public M2Array<ushort> BlendingMaps { get; } = new M2Array<ushort>();        
 
         public void Load(BinaryReader stream, Format version = Format.Useless)
-        {
-            BinaryReader fullStream = stream;
-            // LOAD MAGIC
-            var magic = Encoding.UTF8.GetString(stream.ReadBytes(4)); // 0x000            
+        {                                  
+            while (stream.BaseStream.Position < stream.BaseStream.Length) {     // Advance the reader position until the end of the file                                                          
+                ChunkID chunkID = (ChunkID)stream.ReadUInt32();                 // Get the Magic                
+                long chunkSize = (long)stream.ReadUInt32();                     // Get the size in bytes of the current chunk
+                long nextChunkPos = stream.BaseStream.Position + chunkSize;     // The next chunk will be from the current reader's position + size of current chunk            
+                switch (chunkID) {
+                    case ChunkID.MD21:  // MD21 Header
+                        ParseChunkMD21(stream, version);
+                        break;
+                    case ChunkID.SFID:  // Skin File IDs
+                        ParseChunkSFID(stream);
+                        break;
+                    case ChunkID.TXID:  // Texture File IDs
+                        ParseChunkTXID(stream);
+                        break;
+                }
+                //stream.BaseStream.Seek(nextChunkPos, SeekOrigin.Begin);
+            }
+            
+            /*
             if (magic == "MD21") // Has Chunked Data
             {
-                stream.ReadBytes(4); // Ignore chunked structure of Legion (until after reading header)
-                stream = new BinaryReader(new Substream(stream.BaseStream));
-                magic = Encoding.UTF8.GetString(stream.ReadBytes(4));
-            }
+                long chunkSize = (long)stream.ReadUInt32();
+                long nextChunkPos = stream.BaseStream.Position + chunkSize;
+                stream.BaseStream.Seek(nextChunkPos, SeekOrigin.Begin);
 
-            if (magic != "MD20") { UnityEngine.Debug.LogError("Invalid MD20 Magic: " + magic); }
+                while (stream.BaseStream.Position < stream.BaseStream.Length) {                 // Advance the reader position until the end of the file
+                    //string chunkID = Encoding.UTF8.GetString(stream.ReadBytes(4));            // Reading first 4 bytes of a chunk will give us the ID
+                    ChunkID chunkID = (ChunkID)stream.ReadUInt32();                             // Maybe better to use INT for performance
+                    chunkSize = (long)stream.ReadUInt32();                                      // Get the size in bytes of the current chunk
+                    nextChunkPos = stream.BaseStream.Position + chunkSize;                      // The next chunk will be from the current reader's position + size of current chunk
+
+                    // Process current chunk
+                    switch (chunkID) {
+                        case ChunkID.PFID: break;
+                        case ChunkID.SFID: // Skin File IDs
+                            
+                            break;
+                        case ChunkID.AFID: break;                        
+                    }
+                    stream.BaseStream.Seek(nextChunkPos, SeekOrigin.Begin); // Advance the reader position to the the next chunk and proceed with loop
+                }
+            }*/
+        }
+
+        private void ParseChunkMD21(BinaryReader stream, Format version) {
+            long positionMD21Begin = stream.BaseStream.Position;
+
+            stream = new BinaryReader(new Substream(stream.BaseStream));
+            ChunkID chunkID = (ChunkID)stream.ReadUInt32();
+            if (chunkID != ChunkID.MD20) {
+                UnityEngine.Debug.LogError("Invalid MD20 Magic: " + chunkID);
+            }
             // LOAD HEADER
-            if (version == Format.Useless) version = (Format) stream.ReadUInt32();
-            else stream.ReadUInt32();
-            Version = version; // 0x004
+            if (version == Format.Useless) version = (Format)stream.ReadUInt32(); // 0x004
+            else stream.ReadUInt32(); // 0x004
+            Version = version;
             if (version == Format.Useless) { UnityEngine.Debug.LogError("Invalid Version" + version); }
             _name.Load(stream, version); // 0x008
-            GlobalModelFlags = (GlobalFlags) stream.ReadUInt32();
+            GlobalModelFlags = (GlobalFlags)stream.ReadUInt32(); // 
             GlobalSequences.Load(stream, version);
-            Sequences.Load(stream, version); // 0x010
+            Sequences.Load(stream, version); // 0x0
             SkipArrayParsing(stream, version);
             if (version < Format.LichKing) SkipArrayParsing(stream, version);
             Bones.Load(stream, version);
@@ -185,25 +226,23 @@ namespace M2Lib.m2
             _name.LoadContent(stream);
             GlobalSequences.LoadContent(stream);
             Sequences.LoadContent(stream, version);
-            if (version >= Format.LichKing)
-            {
-                foreach (var seq in Sequences.Where(seq => !seq.IsAlias && seq.IsExtern))
-                {
+
+            if (version >= Format.LichKing) {
+                foreach (var seq in Sequences.Where(seq => !seq.IsAlias && seq.IsExtern)) {
                     //var substream = stream.BaseStream as Substream;
                     //var path = substream != null ? ((FileStream) substream.GetInnerStream()).Name : ((FileStream) stream.BaseStream).Name;
                     //seq.ReadingAnimFile = new BinaryReader(new FileStream(seq.GetAnimFilePath(path), FileMode.Open));
                 }
             }
             SetSequences();
+
             Bones.LoadContent(stream, version);
             GlobalVertexList.LoadContent(stream, version);
             //VIEWS
             if (version < Format.LichKing) Views.LoadContent(stream, version);
-            else
-            {
-                for (var i = 0; i < nViews; i++)
-                {
-                    
+            else {
+                for (var i = 0; i < nViews; i++) {
+
                     var view = new M2SkinProfile();
                     var substream = stream.BaseStream as Substream;
                     //var path = substream != null ? ((FileStream)substream.GetInnerStream()).Name : ((FileStream)stream.BaseStream).Name;
@@ -212,7 +251,7 @@ namespace M2Lib.m2
                     //    view.Load(skinFile, version);
                     //    view.LoadContent(skinFile, version);
                     //}
-                    //Views.Add(view);
+                    Views.Add(view);
                 }
             }
             //VIEWS END
@@ -222,13 +261,12 @@ namespace M2Lib.m2
             TextureTransforms.LoadContent(stream, version);
 
             // @author PhilipTNG
-            if(version < Format.Cataclysm) { 
-                foreach(var mat in Materials)
-                {
+            if (version < Format.Cataclysm) {
+                foreach (var mat in Materials) {
                     // Flags fix
-                    mat.Flags = mat.Flags & (M2Material.RenderFlags) 0x1F;
+                    mat.Flags = mat.Flags & (M2Material.RenderFlags)0x1F;
                     // Blending mode fix
-                    if(mat.BlendMode > M2Material.BlendingMode.DeeprunTram) mat.BlendMode = M2Material.BlendingMode.Mod2X;
+                    if (mat.BlendMode > M2Material.BlendingMode.DeeprunTram) mat.BlendMode = M2Material.BlendingMode.Mod2X;
                 }
             }
 
@@ -249,64 +287,22 @@ namespace M2Lib.m2
             Particles.LoadContent(stream, version);
             if (version >= Format.LichKing && GlobalModelFlags.HasFlag(GlobalFlags.Add2Fields)) BlendingMaps.LoadContent(stream, version);
             foreach (var seq in Sequences) { seq.ReadingAnimFile?.Close(); }
+        }
 
-            // Read M2 Chunks
-            stream = fullStream; // Revert back to full file
-            stream.BaseStream.Seek(0, SeekOrigin.Begin);
-
-            magic = Encoding.UTF8.GetString(stream.ReadBytes(4)); // 0x000            
-            if (magic == "MD21") // Has Chunked Data
-            {
-                long chunkSize = (long)stream.ReadUInt32();
-                long nextChunkPos = stream.BaseStream.Position + chunkSize;
-                stream.BaseStream.Seek(nextChunkPos, SeekOrigin.Begin);
-
-                while (stream.BaseStream.Position < stream.BaseStream.Length) {                 // Advance the reader position until the end of the file
-                    //string chunkID = Encoding.UTF8.GetString(stream.ReadBytes(4));            // Reading first 4 bytes of a chunk will give us the ID
-                    ChunkID chunkID = (ChunkID)stream.ReadUInt32();                             // Maybe better to use INT for performance
-                    chunkSize = (long)stream.ReadUInt32();                                      // Get the size in bytes of the current chunk
-                    nextChunkPos = stream.BaseStream.Position + chunkSize;                      // The next chunk will be from the current reader's position + size of current chunk
-
-                    // Process current chunk
-                    switch (chunkID) {
-                        case ChunkID.PFID: break;
-                        case ChunkID.SFID: // Skin File IDs
-                            skinFileDataIDs = new int[nViews];
-                            for (int i = 0; i < nViews; i++) {
-                                skinFileDataIDs[i] = (int)stream.ReadUInt32();
-
-                                // At this point external code (CascLib) uses the FileDataIDs to load
-                                // skinFiles from CASC into a MemoryStream, and a new M2SkinProfile is 
-                                // created from the stream and added to list M2Array<M2SkinProfile>Views.
-                            }
-                            // lod_skinFileDataIDs come next in this chunk
-                            break;
-                        case ChunkID.AFID: break;
-                        case ChunkID.BFID: break;
-                        case ChunkID.TXAC: break;
-                        case ChunkID.EXPT: break;
-                        case ChunkID.EXP2: break;
-                        case ChunkID.PABC: break;
-                        case ChunkID.PADC: break;
-                        case ChunkID.PSBC: break;
-                        case ChunkID.PEDC: break;
-                        case ChunkID.SKID: break;
-                        case ChunkID.TXID: break;
-                        case ChunkID.LDV1: break;
-                        case ChunkID.RPID: break;
-                        case ChunkID.GPID: break;
-                        case ChunkID.WFV1: break;
-                        case ChunkID.WFV2: break;
-                        case ChunkID.PGD1: break;
-                        case ChunkID.WFV3: break;
-                        case ChunkID.PFDC: break;
-                        case ChunkID.EDGF: break;
-                        case ChunkID.NERF: break;
-                        case ChunkID.DETL: break;
-                    }
-                    stream.BaseStream.Seek(nextChunkPos, SeekOrigin.Begin); // Advance the reader position to the the next chunk and proceed with loop
-                }
+        private void ParseChunkSFID(BinaryReader stream) {
+            for (int i = 0; i < nViews; i++) { // FIX ME: i < nViews
+                Views[i].FileDataID = (int)stream.ReadUInt32();
+                // At this point external code (CascLib) uses the FileDataIDs to load
+                // skinFiles from CASC into a MemoryStream, and a new M2SkinProfile is
+                // created from the stream and added to list M2Array<M2SkinProfile>Views.
             }
+        }
+
+        private void ParseChunkTXID(BinaryReader stream) {
+            for (int i = 0; i < Textures.Count; i++) {
+                Textures[i].FileDataID = (int)stream.ReadUInt32();
+            }
+            
         }
 
         public void Save(BinaryWriter stream, Format version = Format.Useless)

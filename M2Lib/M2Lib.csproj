@@ -18,7 +18,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\CascViewUnity\CascViewUnity\Assets\plugins\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\..\..\..\UnityEditors\2019.4.3f1\Editor\Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -83,8 +84,6 @@
     <Compile Include="src\m2\M2SkinProfile.cs" />
     <Compile Include="src\types\C33Matrix.cs" />
     <Compile Include="src\types\C4Plane.cs" />
-    <Compile Include="src\types\C4Quaternion.cs" />
-    <Compile Include="src\types\C4Vector.cs" />
     <Compile Include="src\types\CAaBox.cs" />
     <Compile Include="src\types\CAaSphere.cs" />
     <Compile Include="src\types\CArgb.cs" />
